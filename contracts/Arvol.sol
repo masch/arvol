@@ -38,9 +38,8 @@ contract Arvol is Initializable {
 
   /* Storage */
 
+  /// @dev Balances from the each account
   mapping (address => uint256) private _balances;
-
-  // mapping (address => mapping (address => uint256)) public allowance;
 
   /// @dev A lower bound of the total supply. Does not take into account tokens minted as Arvol by an address before it moves those (transfer or burn).
   uint256 public _totalSupply;
@@ -70,8 +69,10 @@ contract Arvol is Initializable {
     _totalSupply = initialSupply_;
   }
 
+  /* Getters */
+
   /**
-    * @dev TBD.
+    * @dev Returns the amount of tokens owned by `account`.
     */
   function balanceOf(address account) public view returns (uint256) {
       return _balances[account];
