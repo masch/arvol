@@ -22,7 +22,7 @@ contract Arvol is Initializable {
   /**
    * @dev Emitted when `value` tokens are moved from one account (`from`) to another (`to`).
    *
-   * Note that `value` may be zero.
+   * Note that `value` may be zero. (TBD)
    * Also note that due to continuous minting we cannot emit transfer events from the address 0 when tokens are created.
    * In order to keep consistency, we decided not to emit those events from the address 0 even when minting is done within a transaction.
    */
@@ -67,6 +67,34 @@ contract Arvol is Initializable {
 
     _balances[msg.sender] = initialSupply_;
     _totalSupply = initialSupply_;
+  }
+
+  /* External */
+
+  /**
+    * @dev Moves tokens `amount` from `sender` to `recipient`.
+    *
+    * Emits a {Transfer} event.
+    *
+    * Requirements:
+    *
+    * - `recipient` cannot be the zero address.
+    * - `sender` must have a balance of at least `amount`.
+    */
+  function transfer(
+      address recipient,
+      uint256 amount
+  ) external returns (bool) {
+      require(recipient != address(0), "ERC20: transfer to the zero address");
+
+      uint256 senderBalance = _balances[msg.sender];
+      require(senderBalance >= amount, "ERC20: transfer amount exceeds balance");
+
+      _balances[msg.sender] = senderBalance.sub(amount);
+      _balances[recipient] = _balances[recipient].add(amount);
+
+      emit Transfer(msg.sender, recipient, amount);
+      return true;
   }
 
   /* Getters */
