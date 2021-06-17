@@ -51,11 +51,48 @@ Latest release is [`version 0.0.1`](https://github.com/Arvol/arvol/releases)
 
 ## Deploy
 
-TBD
+1. On `hardhat.config.js` configure the following constants for the `kovan` testnet:
+
+    ```
+    INFURA_API_KEY
+    KOVAN_PRIVATE_KEY
+    ```
+
+2. Deploy on Ethereum `kovan` testnet: 
+
+    ```sh
+    $ npx hardhat run scripts/deploy.js --network kovan
+    ```
+3. Interact with the console:
+
+    ```sh
+    $ npx hardhat console --network kovan
+    ```
+
+    Initalize the token with:
+
+    ```js
+    const Arvol = await ethers.getContractFactory("Arvol"); // Get contract deployed
+    (await ethers.provider.listAccounts()).toString(); // List accounts on the provider
+
+    const address = '0x6c797e6629FA9496e3C3A3309709b9D381fDAFD1' // Replace with your token address
+    const arvol = await Arvol.attach(address) // Get a contract instance
+    (await arvol._totalSupply()).toString(); // Display total supply from account attached
+    ```
 
 ### Upgrade
 
-TBD
+1. Deploy new contract in a fresh address:
+
+    ```sh
+    $ npx hardhat run scripts/prepare.js --network kovan
+    ```
+
+2. Upgrade the proxy contract with the freshly deployed address: 
+
+    ```sh
+    $ npx hardhat run scripts/upgrade.js --network kovan
+    ```
 
 ### Verify
 
