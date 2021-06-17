@@ -18,6 +18,7 @@ contract('Arvol.sol', accounts => {
       addresses = _addresses;
       adminAddress = addresses[0];
       oneAddress = addresses[1];
+      anotherAddress = addresses[2];
 
       ArvolCoin = await ethers.getContractFactory("Arvol");
 
@@ -74,7 +75,7 @@ contract('Arvol.sol', accounts => {
 
       // Check the admin account balance is not affected.
       expect((await arvol.balanceOf(adminAddress)).toString()).to.equal('9999999999000000000000000');
-    });  
+    });
 
     it("require fail - Transfer an amount of token than the admin account owns.", async () => {
       // Check the admin account balance has the amount expected.
@@ -95,5 +96,100 @@ contract('Arvol.sol', accounts => {
       expect((await arvol.balanceOf(oneAddress)).toString()).to.equal('1000000000000000');
     });
 
+    it("require fail - Approve with zero address.", async () => {
+      // Call the approve method with account with zero address MUST fail because is an invalid address
+      await expect(
+        arvol.approve(constants.ZERO_ADDRESS, 123)
+      ).to.be.revertedWith(
+        "ERC20: approve to the zero address"
+      );
+    });
+
+    it("happy path - Approve spend token.", async () => {
+      // Check the allowance value from admin address to one address is 0 before the approve call method.
+      expect((await arvol.allowance(adminAddress, adminAddress)).toString()).to.equal('0');
+      // Check the admin account balance has the amount expected.
+      expect((await arvol.balanceOf(adminAddress)).toString()).to.equal('9999999999000000000000000');
+
+      // Call the approve method to one address account and check the Approval event is emit.
+      await expect(arvol.approve(adminAddress, 12345)).to.emit(arvol, "Approval");
+
+
+      // Check the allowance value from admin address to one address is the one used on the approve call (12345).
+      expect((await arvol.allowance(adminAddress, adminAddress)).toString()).to.equal('12345');
+      // Check the admin account balance has the amount expected.
+      expect((await arvol.balanceOf(adminAddress)).toString()).to.equal('9999999999000000000000000');
+    });  
+
+    it("require fail - Can't transfer more amount than was approved.", async () => {
+      // Check the allowance value from admin address to one address is the one used on the approve call (12345).
+      expect((await arvol.allowance(adminAddress, adminAddress)).toString()).to.equal('12345');
+      // Check the admin account balance has the amount expected.
+      expect((await arvol.balanceOf(adminAddress)).toString()).to.equal('9999999999000000000000000');
+      // Check the admin account balance has the amount expected.
+      expect((await arvol.balanceOf(oneAddress)).toString()).to.equal('1000000000000000');
+
+
+      // Call the transfer method with more than amount allowed MUST fail.
+      await expect(
+        arvol.transferFrom(adminAddress, oneAddress, 12346)
+      ).to.be.revertedWith(
+        "SafeMath: subtraction overflow"
+      );
+
+
+      // Check the allowance value from admin address to one address is the one used on the approve call (12345).
+      expect((await arvol.allowance(adminAddress, adminAddress)).toString()).to.equal('12345');
+      // Check the admin account balance has the amount expected.
+      expect((await arvol.balanceOf(adminAddress)).toString()).to.equal('9999999999000000000000000');
+      // Check the admin account balance has the amount expected.
+      expect((await arvol.balanceOf(oneAddress)).toString()).to.equal('1000000000000000');
+    });  
+
+    it("happy path - Approve transfer some tokens less than allowed.", async () => {
+      expect((await arvol.allowance(adminAddress, adminAddress)).toString()).to.equal('12345');
+      expect((await arvol.balanceOf(adminAddress)).toString()).to.equal('9999999999000000000000000');
+      expect((await arvol.balanceOf(oneAddress)).toString()).to.equal('1000000000000000');
+
+
+      await expect(arvol.transferFrom(adminAddress, oneAddress, 1000)).to.emit(arvol, "Approval");
+
+
+      expect((await arvol.allowance(adminAddress, adminAddress)).toString()).to.equal('11345');
+      expect((await arvol.balanceOf(adminAddress)).toString()).to.equal('9999999998999999999999000')
+      expect((await arvol.balanceOf(oneAddress)).toString()).to.equal('1000000000001000');
+    });
+
+    it("happy path - Approve transfer all remained allowed token.", async () => {
+      expect((await arvol.allowance(adminAddress, adminAddress)).toString()).to.equal('11345');
+      expect((await arvol.balanceOf(adminAddress)).toString()).to.equal('9999999998999999999999000')
+      expect((await arvol.balanceOf(oneAddress)).toString()).to.equal('1000000000001000');
+
+
+      await expect(arvol.transferFrom(adminAddress, oneAddress, 11345)).to.emit(arvol, "Approval");
+
+
+      expect((await arvol.allowance(adminAddress, adminAddress)).toString()).to.equal('0');
+      expect((await arvol.balanceOf(adminAddress)).toString()).to.equal('9999999998999999999987655')
+      expect((await arvol.balanceOf(oneAddress)).toString()).to.equal('1000000000012345');
+    });  
+
+    it("require fail - Since all the tokens allowed were transferred, MUST fail any transfer.", async () => {
+      expect((await arvol.allowance(adminAddress, adminAddress)).toString()).to.equal('0');
+      expect((await arvol.balanceOf(adminAddress)).toString()).to.equal('9999999998999999999987655')
+      expect((await arvol.balanceOf(oneAddress)).toString()).to.equal('1000000000012345');
+
+
+      await expect(
+        arvol.transferFrom(adminAddress, oneAddress, 1)
+      ).to.be.revertedWith(
+        "SafeMath: subtraction overflow"
+      );
+
+
+      expect((await arvol.allowance(adminAddress, adminAddress)).toString()).to.equal('0');
+      expect((await arvol.balanceOf(adminAddress)).toString()).to.equal('9999999998999999999987655')
+      expect((await arvol.balanceOf(oneAddress)).toString()).to.equal('1000000000012345');
+    });
   });
 })
