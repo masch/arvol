@@ -74,16 +74,13 @@ contract Arvol is Initializable {
 
   /* External */
 
-  /**
-    * @dev Moves tokens `amount` from `sender` to `recipient`.
-    *
-    * Emits a {Transfer} event.
-    *
-    * Requirements:
-    *
-    * - `recipient` cannot be the zero address.
-    * - `sender` must have a balance of at least `amount`.
-    */
+ /**
+     * @dev Moves `amount` tokens from the caller's account to `recipient`.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
   function transfer(
       address recipient,
       uint256 amount
