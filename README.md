@@ -12,7 +12,7 @@ A standard for Arvol tokens.
 
 Built in collaboration with [Kleros](https://github.com/kleros) and the [UBI](https://github.com/DemocracyEarth/ubi) project.
 
-[![Build Status](https://travis-ci.com/Arvol/arvol.svg?branch=master)](https://travis-ci.com/Arvol/arvol) [![Coverage Status](https://coveralls.io/repos/github/Arvol/arvol/badge.svg?branch=master)](https://coveralls.io/github/Arvol/arvol?branch=master)
+[![Build Status](https://travis-ci.com/masch/arvol.svg?branch=main)](https://travis-ci.com/masch/arvol) [![Coverage Status](https://coveralls.io/repos/github/masch/arvol/badge.svg?branch=main)](https://coveralls.io/github/masch/arvol?branch=main)
 
 ## Features
 
@@ -24,7 +24,7 @@ Built in collaboration with [Kleros](https://github.com/kleros) and the [UBI](ht
 
 Built with [Hardhat](https://github.com/nomiclabs/hardhat). 
 
-Latest release is [`version 0.0.1`](https://github.com/Arvol/arvol/releases)
+Latest release is [`version 0.0.1`](https://github.com/masch/arvol/releases)
 
 ## Setup
 
